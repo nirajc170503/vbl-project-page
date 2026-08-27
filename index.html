@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Varun Beverages Limited · Financial Model & DCF Valuation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B0D12;
+    --bg-elev: #12151C;
+    --line: rgba(255,255,255,0.08);
+    --line-strong: rgba(255,255,255,0.14);
+    --text: #EDEEF2;
+    --text-dim: #9298A5;
+    --text-faint: #5C6270;
+    --accent: #7C8BFF;
+    --accent-soft: rgba(124,139,255,0.12);
+    --red: #FF8177;
+    --red-soft: rgba(255,129,119,0.10);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  ::selection{ background:var(--accent-soft); color:var(--text); }
+
+  .noise{
+    position:fixed; inset:0; pointer-events:none; z-index:1; opacity:0.035; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 32px; }
+
+  /* NAV */
+  nav{
+    position:relative; z-index:5;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:28px 32px; max-width:1180px; margin:0 auto;
+    border-bottom:1px solid var(--line);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; font-size:14px; letter-spacing:0.02em; color:var(--text-dim);}
+  .brand .dot{ width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 10px var(--accent); }
+  .brand b{ color:var(--text); font-weight:600; }
+  nav .meta{ font-size:13px; color:var(--text-faint); font-family:'IBM Plex Mono', monospace; }
+
+  /* HERO */
+  .hero{
+    position:relative; z-index:2;
+    padding:56px 32px 60px;
+    max-width:1180px; margin:0 auto;
+    display:grid; grid-template-columns: 1.15fr 0.85fr; gap:64px; align-items:start;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.08em;
+    color:var(--accent); text-transform:uppercase; margin-bottom:28px;
+  }
+  .eyebrow::before{ content:''; width:16px; height:1px; background:var(--accent); }
+  h1{
+    font-family:'Instrument Serif', serif; font-weight:400; font-style:normal;
+    font-size:clamp(40px, 4.6vw, 60px); line-height:1.08; letter-spacing:-0.01em;
+    color:var(--text); margin-bottom:20px;
+  }
+  h1 em{ font-style:italic; color:var(--text-dim); }
+  .hero-desc{ font-size:16px; color:var(--text-dim); max-width:460px; line-height:1.65; margin-bottom:30px;}
+  .hero-tags{ display:flex; flex-wrap:wrap; gap:10px; }
+  .tag{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--text-dim);
+    border:1px solid var(--line-strong); padding:7px 12px; border-radius:100px;
+    letter-spacing:0.02em;
+  }
+
+  /* hero right: the curve panel */
+  .hero-visual{
+    position:relative; height:100%; min-height:320px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+  }
+  .curve-card{
+    background:var(--bg-elev); border:1px solid var(--line); border-radius:var(--radius);
+    padding:24px 24px 0; overflow:hidden; position:relative;
+  }
+  .curve-card .label-row{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; padding:0 2px;}
+  .curve-card .label-row span{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--text-faint); letter-spacing:0.05em; }
+  .curve-card .cmp{ font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--red);}
+  .curve-svg{ display:block; width:100%; height:240px; margin-bottom:6px; }
+
+  /* SIGNAL BAR: CMP vs target */
+  .signal{
+    display:flex; align-items:center; gap:14px; margin-top:0; padding:16px 2px 20px;
+    border-top:1px solid var(--line); font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--text-faint);
+  }
+  .signal b{ color:var(--red); font-weight:500; }
+
+  /* STATS SECTION */
+  .section-label{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.08em;
+    color:var(--text-faint); text-transform:uppercase; padding:56px 32px 20px; max-width:1180px; margin:0 auto;
+  }
+  .stats{
+    max-width:1180px; margin:0 auto; padding:0 32px;
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:14px;
+  }
+  .stat{
+    background:var(--bg-elev); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 20px; transition:border-color 0.25s ease, transform 0.25s ease;
+  }
+  .stat:hover{ border-color:var(--line-strong); transform:translateY(-2px); }
+  .stat .k{ font-size:12.5px; color:var(--text-faint); letter-spacing:0.02em; margin-bottom:8px; line-height:1.4; }
+  .stat .v{ font-family:'IBM Plex Mono', monospace; font-size:24px; font-weight:500; color:var(--text); letter-spacing:-0.01em;}
+  .stat.neg .v{ color:var(--red); }
+  .stat.accent .v{ color:var(--accent); }
+
+  @media (max-width: 860px){
+    .stats{ grid-template-columns:repeat(2, 1fr); }
+  }
+
+  /* METHODOLOGY STRIP */
+  .method{
+    max-width:1180px; margin:56px auto 0; padding:0 32px;
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:14px;
+  }
+  .method-item{
+    background:var(--bg-elev); border:1px solid var(--line); border-radius:var(--radius);
+    padding:24px; transition:border-color 0.25s ease, transform 0.25s ease;
+  }
+  .method-item:hover{ border-color:var(--line-strong); transform:translateY(-2px); }
+  .method-item .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px; border-radius:50%;
+    background:var(--accent-soft); color:var(--accent);
+    font-family:'IBM Plex Mono', monospace; font-size:12px; margin-bottom:16px;
+  }
+  .method-item h3{ font-family:'Inter', sans-serif; font-weight:600; font-size:15.5px; margin-bottom:8px; color:var(--text); }
+  .method-item p{ font-size:13.5px; color:var(--text-dim); line-height:1.65; }
+  @media (max-width: 860px){ .method{ grid-template-columns:1fr; } }
+
+  /* CTA */
+  .cta{
+    max-width:1180px; margin:0 auto; padding:64px 32px 96px;
+    display:flex; align-items:center; justify-content:space-between; gap:40px; flex-wrap:wrap;
+  }
+  .cta h2{
+    font-family:'Instrument Serif', serif; font-weight:400; font-size:clamp(20px,2vw,26px);
+    max-width:600px; line-height:1.2; color:var(--text); white-space:nowrap;
+  }
+  @media (max-width: 700px){ .cta h2{ white-space:normal; } }
+  .cta-buttons{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'Inter', sans-serif; font-weight:600; font-size:14.5px;
+    padding:15px 24px; border-radius:10px; text-decoration:none;
+    transition:all 0.2s ease; border:1px solid transparent; white-space:nowrap;
+  }
+  .btn-primary{ background:var(--text); color:var(--bg); }
+  .btn-primary:hover{ background:var(--accent); color:#fff; transform:translateY(-1px); }
+  .btn-ghost{ border-color:var(--line-strong); color:var(--text); }
+  .btn-ghost:hover{ border-color:var(--text-dim); background:var(--bg-elev); transform:translateY(-1px); }
+  .btn svg{ width:15px; height:15px; }
+
+  footer{
+    border-top:1px solid var(--line); padding:26px 32px; max-width:1180px; margin:0 auto;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+    font-size:13px; color:var(--text-faint);
+  }
+  footer a{ color:var(--text-faint); }
+
+  @media (max-width: 860px){
+    .hero{ grid-template-columns:1fr; padding-top:64px; }
+    nav{ padding:22px 20px; } .wrap, .hero, .stats, .method, .cta, footer{ padding-left:20px; padding-right:20px; }
+    .section-label{ padding-left:20px; padding-right:20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; scroll-behavior:auto !important; }
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<nav>
+  <div class="brand"><span class="dot"></span> <b>Niraj Chaudhari</b></div>
+  <div class="meta">DCF Valuation Model</div>
+</nav>
+
+<section class="hero">
+  <div>
+    <div class="eyebrow">MBA Finance Project · MIT Pune</div>
+    <h1>A DCF valuation of<br><em>Varun Beverages Limited.</em></h1>
+    <p class="hero-desc">A ten year, three statement financial model built line by line, from revenue down to free cash flow, feeding a full FCFF discounted cash flow valuation that's cross checked across perpetuity growth and exit multiple methods.</p>
+  </div>
+
+  <div class="hero-visual">
+    <div class="curve-card">
+      <div class="label-row">
+        <span>IMPLIED VALUE / SHARE</span>
+        <span class="cmp">CMP ₹430.20</span>
+      </div>
+      <svg class="curve-svg" viewBox="0 0 320 260" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#7C8BFF" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#7C8BFF" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- CMP reference line -->
+        <line x1="0" y1="32" x2="320" y2="32" stroke="#FF8177" stroke-width="1" stroke-dasharray="3 4" opacity="0.6"/>
+        <!-- area under curve -->
+        <path d="M0,178 C40,166 60,112 100,128 C150,148 170,95 210,85 C250,75 270,108 320,97 L320,260 L0,260 Z" fill="url(#fillGrad)"/>
+        <!-- curve line -->
+        <path d="M0,178 C40,166 60,112 100,128 C150,148 170,95 210,85 C250,75 270,108 320,97" fill="none" stroke="#7C8BFF" stroke-width="2.5"/>
+        <circle cx="320" cy="97" r="4" fill="#7C8BFF"/>
+      </svg>
+      <div class="signal">Model implies <b>−43.3%</b> vs. current market price</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-label">Valuation output</div>
+<div class="stats">
+  <div class="stat">
+    <div class="k">Value / share (perpetuity growth)</div>
+    <div class="v">₹243.96</div>
+  </div>
+  <div class="stat">
+    <div class="k">Value / share (exit multiple)</div>
+    <div class="v">₹292.72</div>
+  </div>
+  <div class="stat accent">
+    <div class="k">Average target value</div>
+    <div class="v">₹268.34</div>
+  </div>
+  <div class="stat">
+    <div class="k">Current market price</div>
+    <div class="v">₹430.20</div>
+  </div>
+  <div class="stat neg">
+    <div class="k">Implied downside</div>
+    <div class="v">−43.3%</div>
+  </div>
+  <div class="stat">
+    <div class="k">WACC</div>
+    <div class="v">10.50%</div>
+  </div>
+  <div class="stat">
+    <div class="k">Terminal growth rate</div>
+    <div class="v">5.75%</div>
+  </div>
+  <div class="stat">
+    <div class="k">Exit EV / EBITDA</div>
+    <div class="v">16.0x</div>
+  </div>
+</div>
+
+<div class="method">
+  <div class="method-item">
+    <div class="num">01</div>
+    <h3>Three-statement model</h3>
+    <p>Income statement, balance sheet, and cash flow statement fully linked, historicals through FY35E, with assumptions driving every forecast line.</p>
+  </div>
+  <div class="method-item">
+    <div class="num">02</div>
+    <h3>FCFF build & DCF</h3>
+    <p>Free cash flow to firm built up from EBIT through NOPAT, capex, and working capital, discounted at WACC across a ten-year explicit forecast.</p>
+  </div>
+  <div class="method-item">
+    <div class="num">03</div>
+    <h3>Sensitivity analysis</h3>
+    <p>Valuation stress-tested across WACC × terminal growth and WACC × exit EV/EBITDA multiple, to bound the output under differing assumptions.</p>
+  </div>
+</div>
+
+<div class="cta">
+  <h2>Open the model, or read the full writeup.</h2>
+  <div class="cta-buttons">
+    <a class="btn btn-primary" href="REPLACE_SHEETS_LINK" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      View financial model
+    </a>
+    <a class="btn btn-ghost" href="REPLACE_PDF_LINK" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Read full report
+    </a>
+  </div>
+</div>
+
+<footer>
+  <span>Niraj Chaudhari · MBA Finance Project, MIT Pune</span>
+  <span>Model: DCF · FCFF · FY26–FY35E</span>
+</footer>
+
+</body>
+</html>
